@@ -2,6 +2,6 @@
 
 Rails.application.routes.draw do
   namespace :api do
-    get 'users/get_users'
+    get 'users/all_users'
   end
 end

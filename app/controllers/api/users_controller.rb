@@ -1,6 +1,6 @@
 module Api
   class UsersController < ApplicationController
-    def get_users
+    def all_users
       @users = User.all
       render json: @users
     end
