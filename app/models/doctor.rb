@@ -1,15 +1,13 @@
-# rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+# rubocop:disable Metrics/MethodLength
 # frozen_string_literal: true
 
 # app/models/doctor.rb
 class Doctor < ApplicationRecord
   has_many :reservations
 
-  validate :valid_reservation_time, on: :create
-
-  # ...
-
-  # ...
+  validates :name, presence: true
+  validates :starting_shift, presence: true
+  validates :ending_shift, presence: true
 
   def available_time_slots_for_month
     available_time_ranges = []
@@ -22,27 +20,21 @@ class Doctor < ApplicationRecord
 
       iterate_through_shift_hours(day_start, day_end) do |hour|
         current_time = build_current_time_object(hour, date)
+        next if overlapping_reservation?(current_time)
 
-        unless overlapping_reservation?(current_time)
-          start_time = format_time(hour)
-          end_time = format_time(hour + 1.hour)
-
-          available_time_ranges << build_time_slot(start_time, end_time, date)
-        end
+        available_time_ranges << build_time_slot(format_time(hour), format_time(hour + 1.hour), date)
       end
     end
 
     available_time_ranges
   end
 
-  private
-
   def parse_shift_time(shift)
     shift.is_a?(Time) ? shift : Time.parse(shift)
   end
 
   def each_day_within_next_30_days(&block)
-    (Date.today..(Date.today + 30.days)).each(&block)
+    (Date.today.next_day..(Date.today + 30.days)).each(&block)
   end
 
   def calculate_day_bounds(date, starting_time, ending_time)
@@ -78,58 +70,64 @@ class Doctor < ApplicationRecord
     }
   end
 
-  def all_reservations
-    reservations.order(:created_at) # Order by 'created_at' instead of 'time_booked'
-  end
-
   def overlapping_reservation?(time)
-    reservations.where(
-      '(time_booked = ? AND day_of_month = ? AND day_of_week = ? AND month = ?)', time[:time_booked], time[:day_of_month], time[:day_of_week], time[:month]
-    ).exists?
-  end
-
-  def invalid_time_range?(time)
     start_time = time[:time_booked]
-    end_time = time[:time_booked] + 1.hour
+    end_time = start_time + 1.hour
 
-    # Check if there is an existing reservation within the one-hour range
     reservations.where(
       'time_booked BETWEEN ? AND ? AND day_of_month = ? AND day_of_week = ? AND month = ?',
       start_time, end_time, time[:day_of_month], time[:day_of_week], time[:month]
     ).exists?
   end
 
-  def weekday_shift?
-    reservations.exists?(
-      time_booked: starting_shift.to_i..ending_shift.to_i,
-      created_at: 1.month.from_now.beginning_of_month..Time.current.end_of_month
-    )
+  def build_time_slot_rev(start_time, end_time, day_of_month, _day_of_week, month)
+    # year = Date.current.year
+    date = Date.new(Date.current.year, month, day_of_month)
+    day_of_week_in_year = date.strftime('%A')
+
+    {
+      start_time:,
+      end_time:,
+      day_of_month:,
+      day_of_week: day_of_week_in_year,
+      month: MONTHS[month]
+    }
   end
 
-#   def valid_reservation_time
-#     if weekday_shift? && overlapping_reservation?({
-#                                                     time_booked: starting_shift.to_i,
-#                                                     day_of_month: Date.today.day,
-#                                                     day_of_week: Date.today.strftime('%A'),
-#                                                     month: Date.today.month
-#                                                   })
-#       errors.add(:base, 'Doctor is already reserved during this time on this day')
-#     end
 
-#     return unless weekday_shift? && invalid_time_range?({
-#                                                           time_booked: starting_shift.to_i,
-#                                                           day_of_month: Date.today.day,
-#                                                           day_of_week: Date.today.strftime('%A'),
-#                                                           month: Date.today.month
-#                                                         })
+  MONTHS = [nil, 'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'].freeze
 
-#     errors.add(:base, 'Reservation time range must be one hour')
+  def format_time_slots(hour)
+    "#{hour.to_s.rjust(2, '0')}:00"
+  end
 
-#     # Check if the reservation is more than a month ahead
-#     return unless starting_shift.to_i > 1.month.from_now.to_i
+  def reservations_as_time_slots
+    time_slots = []
 
-#     errors.add(:base, 'Reservations cannot be made more than a month ahead')
-#   end
+    reservations.each do |reservation|
+      start_time = reservation.time_booked
+      end_time = start_time + 1
+      time_slots << build_time_slot_rev(format_time_slots(start_time),
+                                        format_time_slots(end_time),
+                                        reservation.day_of_month,
+                                        reservation.day_of_week, reservation.month)
+    end
+
+    time_slots
+  end
+
+  def filter_available_slots
+    available_slots = available_time_slots_for_month
+    reserved_slots = reservations_as_time_slots
+
+    available_slots.reject do |slot|
+      reserved_slots.any? do |reserved_slot|
+        reserved_slot.values_at(:start_time, :end_time, :day_of_month, :day_of_week,
+                                :month) == slot.values_at(:start_time, :end_time, :day_of_month, :day_of_week, :month)
+      end
+    end
+  end
 end
 
-# rubocop:enable Metrics/AbcSize, Metrics/MethodLength
+# rubocop:enable Metrics/MethodLength

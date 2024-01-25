@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# db/migrate/YYYYMMDDHHMMSS_create_doctors.rb
 class CreateDoctors < ActiveRecord::Migration[7.1]
   def change
     create_table :doctors do |t|

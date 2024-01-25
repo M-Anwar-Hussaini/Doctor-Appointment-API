@@ -2,12 +2,33 @@
 
 class DoctorsController < ApplicationController
   before_action :set_doctor, only: %i[show update destroy]
+  before_action :authorize_admin, only: %i[create destroy]
 
   # GET /doctors
   def index
     @doctors = Doctor.all
 
     render json: @doctors
+  end
+
+  def doctor_params
+    params.require(:doctor).permit(:name, :specialty, :starting_shift, :ending_shift)
+  end
+
+  def current_user
+    @current_user ||= User.find_by(id: session[:user_id])
+  end
+
+  def authorize_admin
+    return if current_user&.admin?
+
+    redirect_to root_path, alert: 'You are not authorized to perform this action.'
+  end
+
+  def available_slots
+    @doctor = Doctor.find(params[:id])
+    @available_slots = @doctor.filter_available_slots
+    render json: @available_slots
   end
 
   # GET /doctors/1
@@ -37,7 +58,14 @@ class DoctorsController < ApplicationController
 
   # DELETE /doctors/1
   def destroy
-    @doctor.destroy!
+    @doctor = Doctor.find(params[:id])
+
+    if current_user.role == 'admin'
+      @doctor.destroy!
+      redirect_to doctors_url, notice: 'Doctor was successfully destroyed.'
+    else
+      redirect_to doctors_url, alert: 'You do not have permission to delete this doctor.'
+    end
   end
 
   private

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# db/migrate/xxxxxx_create_reservations.rb
+# db/migrate/YYYYMMDDHHMMSS_create_reservations.rb
 class CreateReservations < ActiveRecord::Migration[7.1]
   def change
     create_table :reservations do |t|

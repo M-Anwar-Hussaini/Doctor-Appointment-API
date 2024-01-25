@@ -4,24 +4,23 @@
 class Reservation < ApplicationRecord
   belongs_to :doctor
 
-  # validate :valid_reservation_time, on: :create
-  validates :time_booked, presence: true,
-                          numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 23 }
+  # Add any additional validations as needed
+  validates :day_of_month, presence: true
+  validates :day_of_week, presence: true
+  validates :time_booked, presence: true
+  validates :month, presence: true
 
-  # private
-
-  # def valid_reservation_time
-  #   if doctor.weekday_shift? && doctor.overlapping_reservation?(time_booked)
-  #     errors.add(:base, 'Doctor is already reserved during this time on this day')
-  #   end
-
-  #   return unless doctor.weekday_shift? && doctor.invalid_time_range?(time_booked)
-
-  #   errors.add(:base, 'Reservation time range must be one hour')
-
-  #   # Check if the reservation is more than a month ahead
-  #   return unless time_booked > 1.month.from_now
-
-  #   errors.add(:base, 'Reservations cannot be made more than a month ahead')
-  # end
+  # Add any custom methods or validations related to reservations
+  def self.reservations_with_doctors
+    includes(:doctor).map do |reservation|
+      {
+        reservation_id: reservation.id,
+        doctor_name: reservation.doctor.name,
+        reservation_time: reservation.time_booked,
+        day_of_week: reservation.day_of_week,
+        month: reservation.month,
+        created_at_formatted: reservation.created_at.strftime('%B %d, %Y %H:%M:%S') # Format created_at timestamp
+      }
+    end
+  end
 end

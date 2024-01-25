@@ -1,13 +1,19 @@
 # frozen_string_literal: true
 
+# config/routes.rb
 Rails.application.routes.draw do
-  resources :doctors
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  get 'reservations/create' # This line is not necessary if you are using RESTful routes
+  resources :doctors do
+    resources :reservations, only: [:create] # Define reservations routes nested under doctors
+    get 'available_slots', to: 'doctors#available_slots' # Define a custom route for available slots
+    get 'reservations_with_doctors', to: 'reservations#reservations_with_doctors' # Define a route for reservations with doctors
+  end
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  # Define other routes as needed
+
+  # Reveal health status route
   get 'up' => 'rails/health#show', as: :rails_health_check
 
-  # Defines the root path route ("/")
+  # Define the root path route
   # root "posts#index"
 end
