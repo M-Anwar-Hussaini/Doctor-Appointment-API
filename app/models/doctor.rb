@@ -1,6 +1,3 @@
-# rubocop:disable Metrics/MethodLength
-# frozen_string_literal: true
-
 # app/models/doctor.rb
 class Doctor < ApplicationRecord
   has_many :reservations
@@ -33,8 +30,8 @@ class Doctor < ApplicationRecord
     shift.is_a?(Time) ? shift : Time.parse(shift)
   end
 
-  def each_day_within_next_30_days(&block)
-    (Date.today.next_day..(Date.today + 30.days)).each(&block)
+  def each_day_within_next_30_days(&)
+    (Date.today.next_day..(Date.today + 30.days)).each(&)
   end
 
   def calculate_day_bounds(date, starting_time, ending_time)
@@ -43,8 +40,8 @@ class Doctor < ApplicationRecord
     [day_start, day_end]
   end
 
-  def iterate_through_shift_hours(day_start, day_end, &block)
-    (day_start.to_i...day_end.to_i).step(1.hour, &block)
+  def iterate_through_shift_hours(day_start, day_end, &)
+    (day_start.to_i...day_end.to_i).step(1.hour, &)
   end
 
   def build_current_time_object(hour, date)
@@ -129,5 +126,3 @@ class Doctor < ApplicationRecord
     end
   end
 end
-
-# rubocop:enable Metrics/MethodLength

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # app/models/reservation.rb
 class Reservation < ApplicationRecord
   belongs_to :doctor

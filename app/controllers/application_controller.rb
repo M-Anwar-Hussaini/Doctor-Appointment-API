@@ -1,11 +1,9 @@
-# frozen_string_literal: true
-
 class ApplicationController < ActionController::API
-  before_action :set_current_user
+  # before_action :set_current_user
 
-  private
+  # private
 
-  def set_current_user
-    @set_current_user ||= User.find_by(id: session[:user_id])
-  end
+  # def set_current_user
+  #   @set_current_user ||= User.find_by(id: session[:user_id])
+  # end
 end

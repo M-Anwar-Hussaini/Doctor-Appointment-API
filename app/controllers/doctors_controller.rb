@@ -1,8 +1,6 @@
-# frozen_string_literal: true
-
 class DoctorsController < ApplicationController
   before_action :set_doctor, only: %i[show update destroy]
-  before_action :authorize_admin, only: %i[create destroy]
+  # before_action :authorize_admin, only: %i[create destroy]
 
   # GET /doctors
   def index
@@ -11,8 +9,8 @@ class DoctorsController < ApplicationController
     render json: @doctors
   end
 
-  def doctor_params
-    params.require(:doctor).permit(:name, :specialty, :starting_shift, :ending_shift)
+  def new
+    @doctor_id = params[:doctor_id]
   end
 
   def current_user
@@ -26,7 +24,7 @@ class DoctorsController < ApplicationController
   end
 
   def available_slots
-    @doctor = Doctor.find(params[:id])
+    @doctor = Doctor.find_by(params[:doctor_id])
     @available_slots = @doctor.filter_available_slots
     render json: @available_slots
   end
@@ -67,8 +65,6 @@ class DoctorsController < ApplicationController
       redirect_to doctors_url, alert: 'You do not have permission to delete this doctor.'
     end
   end
-
-  private
 
   # Use callbacks to share common setup or constraints between actions.
   def set_doctor
