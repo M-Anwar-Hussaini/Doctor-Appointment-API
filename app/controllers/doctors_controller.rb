@@ -34,16 +34,33 @@ class DoctorsController < ApplicationController
     render json: @doctor
   end
 
-  # POST /doctors
-  def create
-    @doctor = Doctor.new(doctor_params)
+# POST /doctors
+def create
+  # Log the parameters being received
+  Rails.logger.debug "Received parameters: #{params.inspect}"
 
-    if @doctor.save
-      render json: @doctor, status: :created, location: @doctor
-    else
-      render json: @doctor.errors, status: :unprocessable_entity
-    end
+  @doctor = Doctor.new(doctor_params)
+
+  # Log the doctor_params method result
+  Rails.logger.debug "doctor_params result: #{doctor_params.inspect}"
+
+  # Parse starting_shift and ending_shift strings into Time objects
+  @doctor.starting_shift = Time.parse(doctor_params[:starting_shift])
+  @doctor.ending_shift = Time.parse(doctor_params[:ending_shift])
+
+  # Rails.logger.debug "@doctor.starting_shift result: #{@doctor.starting_shift}"
+  # Rails.logger.debug "@doctor.ending_shift result: #{@doctor.ending_shift}"
+
+  if @doctor.save
+    render json: @doctor, status: :created, location: @doctor
+  else
+    render json: @doctor.errors, status: :unprocessable_entity
   end
+end
+
+
+
+
 
   # PATCH/PUT /doctors/1
   def update
