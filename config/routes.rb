@@ -1,21 +1,22 @@
-# frozen_string_literal: true
-
-# config/routes.rb
 Rails.application.routes.draw do
-  get 'reservations/create' # This line is not necessary if you are using RESTful routes
-  resources :doctors do
-    resources :reservations, only: %i[index create] # Restrict reservations routes to only index and create actions
-    # Define a custom route for available slots, using the doctor's ID directly
+  # Routes for doctors
+  resources :doctors, only: [:index, :show, :create, :update, :destroy] do
+    resources :reservations, only: [:index, :create]
     get 'available_slots', to: 'doctors#available_slots', on: :member
   end
 
-  get 'reservations_with_doctors', to: 'reservations#reservations_with_doctors' # Define a route for reservations with doctors
+  # Route to fetch reservations created under doctors by a specific user
+  get '/users/:id/reservations_created_under_doctors', to: 'users#reservations_created_under_doctors', as: 'user_reservations'
 
-  # Define other routes as needed
+  # Route to fetch all reservations with associated doctors
+  get 'all_reservations', to: 'reservations#reservations_with_doctors'
 
-  # Reveal health status route
-  get 'up' => 'rails/health#show', as: :rails_health_check
+  # Authentication routes
+  post '/login', to: 'sessions#create'
+  delete '/logout', to: 'sessions#destroy'
+  
+  # Signup route
+  post '/signup', to: 'users#create'
 
-  # Define the root path route
-  # root "posts#index"
+  resources :users, only: [:index]
 end
