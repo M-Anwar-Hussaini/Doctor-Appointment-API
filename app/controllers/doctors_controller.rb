@@ -53,7 +53,6 @@ class DoctorsController < ApplicationController
       Rails.logger.debug "Starting Shift Param: #{doctor_params[:starting_shift]}"
       Rails.logger.debug "Ending Shift Param: #{doctor_params[:ending_shift]}"
 
-
       if @doctor.save
         render json: @doctor, status: :created, location: @doctor
       else
