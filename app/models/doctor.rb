@@ -8,7 +8,6 @@ class Doctor < ApplicationRecord
 
   def available_time_slots_for_month
     available_time_ranges = []
-
     # starting_time = parse_shift_time(starting_shift).strftime('%H:%M')
     # ending_time = parse_shift_time(ending_shift).strftime('%H:%M')
     starting_time = parse_shift_time(starting_shift)
@@ -50,14 +49,10 @@ class Doctor < ApplicationRecord
   #                        starting_time_obj.sec)
   #   day_end = Time.new(date.year, date.month, date.day,
   # ending_time_obj.hour, ending_time_obj.min, ending_time_obj.sec)
-
   #   Rails.logger.debug "Processing date: #{date}"
   #   Rails.logger.debug "Day start time: #{day_start}, Day end time: #{day_end}"
-
   #   [day_start, day_end]
   # end
-
-
 
   def calculate_day_bounds(date, starting_time, ending_time)
     day_start = Time.new(date.year, date.month, date.day, starting_time.hour, starting_time.min, starting_time.sec)
