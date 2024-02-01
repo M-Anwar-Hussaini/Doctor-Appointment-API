@@ -13,12 +13,12 @@ class Reservation < ApplicationRecord
   # Add any custom methods or validations related to reservations
   def self.reservations_with_doctors_and_users
     includes(:doctor, :user).map do |reservation|
-      doctor_name = Doctor.find_by(id: reservation.doctor_id)&.name
+      doctor_namee = Doctor.find_by(id: reservation.doctor_id)&.name
       user_name = User.find_by(id: reservation.user_id)&.firstname
 
       {
         reservation_id: reservation.id,
-        doctor_name: doctor_name,
+        doctor_name: doctor_namee,
         booking_user_name: user_name,
         reservation_time: reservation.start_time,
         day_of_week: reservation.day_of_week,
