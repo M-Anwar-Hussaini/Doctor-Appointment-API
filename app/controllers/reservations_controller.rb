@@ -39,9 +39,9 @@ class ReservationsController < ApplicationController
 
     if slot_available?(@available_slots, reservation_params)
 
-    @reservation = @doctor.reservations.build(reservation_params.merge(user_id: current_user.id))
-    @reservation.save
-    render json: @reservation, status: :created
+      @reservation = @doctor.reservations.build(reservation_params.merge(user_id: current_user.id))
+      @reservation.save
+      render json: @reservation, status: :created
     else
       # Slot is not available, show error message or handle as needed
       render json: { error: 'Selected slot is not available.' }, status: :unprocessable_entity

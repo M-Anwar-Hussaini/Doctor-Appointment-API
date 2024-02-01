@@ -22,5 +22,5 @@ class Reservation < ApplicationRecord
         created_at_formatted: reservation.created_at.strftime('%B %d, %Y %H:%M:%S')
       }
     end
-  end  
+  end
 end
