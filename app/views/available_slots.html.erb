@@ -1,0 +1,13 @@
+<!-- app/views/doctors/available_slots.html.erb -->
+<h1>Available Slots</h1>
+<ul>
+  <% @available_slots.each do |slot| %>
+    <li>
+      <strong>Start Time:</strong> <%= slot[:start_time] %><br>
+      <strong>End Time:</strong> <%= slot[:end_time] %><br>
+      <strong>Day of Month:</strong> <%= slot[:day_of_month] %><br>
+      <strong>Day of Week:</strong> <%= slot[:day_of_week] %><br>
+      <strong>Month:</strong> <%= slot[:month] %>
+    </li>
+  <% end %>
+</ul>

@@ -44,3 +44,11 @@ group :development do
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"
 end
+
+gem 'rubocop', '>= 1.0', '< 2.0'
+
+gem 'rack-cors', require: 'rack/cors'
+
+gem 'bcrypt'
+
+gem 'jwt'
