@@ -1,24 +1,31 @@
 # app/models/reservation.rb
 class Reservation < ApplicationRecord
   belongs_to :doctor
+  belongs_to :user
 
   # Add any additional validations as needed
   validates :day_of_month, presence: true
   validates :day_of_week, presence: true
-  validates :time_booked, presence: true
+  validates :start_time, presence: true
+  validates :end_time, presence: true
   validates :month, presence: true
 
   # Add any custom methods or validations related to reservations
-  def self.reservations_with_doctors
-    includes(:doctor).map do |reservation|
+  def self.reservations_with_doctors_and_users
+    includes(:doctor, :user).map do |reservation|
+      doctor_name = Doctor.find_by(id: reservation.doctor_id)&.name
+      user_name = User.find_by(id: reservation.user_id)&.firstname
+  
       {
         reservation_id: reservation.id,
-        doctor_name: reservation.doctor.name,
-        reservation_time: reservation.time_booked,
+        doctor_name: doctor_name,
+        booking_user_name: user_name,
+        reservation_time: reservation.start_time,
         day_of_week: reservation.day_of_week,
         month: reservation.month,
-        created_at_formatted: reservation.created_at.strftime('%B %d, %Y %H:%M:%S') # Format created_at timestamp
+        created_at_formatted: reservation.created_at.strftime('%B %d, %Y %H:%M:%S')
       }
     end
   end
+  
 end

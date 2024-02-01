@@ -1,5 +1,6 @@
 # app/controllers/reservations_controller.rb
 class ReservationsController < ApplicationController
+  before_action :authorize_request, only: [:create]
   def index
     @doctor = Doctor.find(params[:doctor_id])
     @reservations = @doctor.reservations
@@ -7,12 +8,13 @@ class ReservationsController < ApplicationController
   end
 
   def reservations_with_doctors
-    @reservations_with_doctors = Reservation.reservations_with_doctors
-    render json: @reservations_with_doctors
+    @reservations = Reservation.reservations_with_doctors_and_users
+    render json: @reservations
   end
 
   def create
     @doctor = Doctor.find(params[:doctor_id])
+    # @user = User.find(params[:doctor_id])
     @available_slots = @doctor.filter_available_slots
 
     # Debug statement
@@ -27,13 +29,8 @@ class ReservationsController < ApplicationController
 
     if slot_available?(@available_slots, reservation_params)
 
-      @reservation = @doctor.reservations.create(
-        day_of_month: reservation_params[:day_of_month],
-        day_of_week: reservation_params[:day_of_week],
-        time_booked: reservation_params[:start_time],
-        month: reservation_params[:month]
-      )
-
+      @reservation = @doctor.reservations.build(reservation_params.merge(user_id: current_user.id))
+      @reservation.save
       render json: @reservation, status: :created
     else
       # Slot is not available, show error message or handle as needed
