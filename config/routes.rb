@@ -1,10 +1,22 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  # Routes for doctors
+  resources :doctors, only: [:index, :show, :create, :update, :destroy] do
+    resources :reservations, only: [:index, :create]
+    get 'available_slots', to: 'doctors#available_slots', on: :member
+  end
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
+  # Route to fetch reservations created under doctors by a specific user
+  get '/users/:id/reservations_created_under_doctors', to: 'users#reservations_created_under_doctors', as: 'user_reservations'
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # Route to fetch all reservations with associated doctors
+  get 'all_reservations', to: 'reservations#reservations_with_doctors'
+
+  # Authentication routes
+  post '/login', to: 'sessions#create'
+  delete '/logout', to: 'sessions#destroy'
+  
+  # Signup route
+  post '/signup', to: 'users#create'
+
+  resources :users, only: [:index]
 end

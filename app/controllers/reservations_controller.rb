@@ -1,6 +1,5 @@
 # app/controllers/reservations_controller.rb
 class ReservationsController < ApplicationController
-  before_action :authorize_request, only: [:create]
   def index
     @doctor = Doctor.find(params[:doctor_id])
     @reservations = @doctor.reservations
@@ -8,23 +7,12 @@ class ReservationsController < ApplicationController
   end
 
   def reservations_with_doctors
-    @reservations = Reservation.includes(doctor: %i[created_by user]).map do |reservation|
-      {
-        reservation_id: reservation.id,
-        doctor_name: reservation.doctor.name,
-        booking_user_name: reservation.user.name,
-        reservation_time: @doctor.format_time_slots(reservation.start_time),
-        day_of_week: reservation.day_of_week,
-        month: reservation.month,
-        created_at_formatted: reservation.created_at.strftime('%B %d, %Y %H:%M:%S') # Format created_at timestamp
-      }
-    end
-    render json: @reservations
+    @reservations_with_doctors = Reservation.reservations_with_doctors
+    render json: @reservations_with_doctors
   end
 
   def create
     @doctor = Doctor.find(params[:doctor_id])
-    # @user = User.find(params[:doctor_id])
     @available_slots = @doctor.filter_available_slots
 
     # Debug statement
@@ -39,9 +27,14 @@ class ReservationsController < ApplicationController
 
     if slot_available?(@available_slots, reservation_params)
 
-    @reservation = @doctor.reservations.build(reservation_params.merge(user_id: current_user.id))
-    @reservation.save
-    render json: @reservation, status: :created
+      @reservation = @doctor.reservations.create(
+        day_of_month: reservation_params[:day_of_month],
+        day_of_week: reservation_params[:day_of_week],
+        time_booked: reservation_params[:start_time],
+        month: reservation_params[:month]
+      )
+
+      render json: @reservation, status: :created
     else
       # Slot is not available, show error message or handle as needed
       render json: { error: 'Selected slot is not available.' }, status: :unprocessable_entity

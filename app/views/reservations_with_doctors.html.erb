@@ -1,0 +1,29 @@
+<!-- app/views/reservations/reservations_with_doctors.html.erb -->
+
+<h1>Reservations with Doctors</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Reservation ID</th>
+      <th>Doctor Name</th>
+      <th>Reservation Time</th>
+      <th>Day of Week</th>
+      <th>Month</th>
+      <th>Created At</th>
+      <!-- Add more columns as needed -->
+    </tr>
+  </thead>
+  <tbody>
+    <% @reservations_with_doctors.each do |reservation| %>
+      <tr>
+        <td><%= reservation[:reservation_id] %></td>
+        <td><%= reservation[:doctor_name] %></td>
+        <td><%= reservation[:reservation_time] %></td>
+        <td><%= reservation[:day_of_week] %></td>
+        <td><%= reservation[:month] %></td>
+        <td><%= reservation[:created_at_formatted] %></td>
+        <!-- Add more cells for additional information -->
+      </tr>
+    <% end %>
+  </tbody>
+</table>
