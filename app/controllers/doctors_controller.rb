@@ -24,7 +24,7 @@ class DoctorsController < ApplicationController
   # end
 
   def available_slots
-    @doctor = Doctor.find_by(params[:doctor_id])
+    @doctor = Doctor.find(params[:id])
     Rails.logger.debug "Doctor object: #{@doctor.inspect}"
     @available_slots = @doctor.filter_available_slots
     render json: @available_slots

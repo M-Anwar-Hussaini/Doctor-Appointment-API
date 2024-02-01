@@ -104,15 +104,23 @@ class Doctor < ApplicationRecord
     # year = Date.current.year
     date = Date.new(Date.current.year, month, day_of_month)
     day_of_week_in_year = date.strftime('%A')
-
+  
+    Rails.logger.debug "Building time slot for: "
+    Rails.logger.debug "Start Time: #{start_time}"
+    Rails.logger.debug "End Time: #{end_time}"
+    Rails.logger.debug "Day of Month: #{day_of_month}"
+    Rails.logger.debug "Day of Week: #{day_of_week_in_year}"
+    Rails.logger.debug "Month: #{MONTHS[month]}"
+  
     {
-      start_time:,
-      end_time:,
-      day_of_month:,
+      start_time: start_time,
+      end_time: end_time,
+      day_of_month: day_of_month,
       day_of_week: day_of_week_in_year,
       month: MONTHS[month]
     }
   end
+  
 
   MONTHS = [nil, 'January', 'February', 'March', 'April', 'May', 'June',
             'July', 'August', 'September', 'October', 'November', 'December'].freeze
