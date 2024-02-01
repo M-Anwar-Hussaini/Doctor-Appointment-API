@@ -31,7 +31,10 @@ module DoctorAppointmentApi
     config.autoload_lib(ignore: %w[assets tasks])
 
     # Configuration for the application, engines, and railties goes here.
-    #
+    # Enable session storage
+    config.middleware.use ActionDispatch::Session::CookieStore
+    ## Configure session store
+    config.session_store :cookie_store, key: '_doctor_appointment_session', domain: :all
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
