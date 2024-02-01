@@ -15,7 +15,7 @@ class Reservation < ApplicationRecord
     includes(:doctor, :user).map do |reservation|
       doctor_name = Doctor.find_by(id: reservation.doctor_id)&.name
       user_name = User.find_by(id: reservation.user_id)&.firstname
-  
+
       {
         reservation_id: reservation.id,
         doctor_name: doctor_name,
@@ -27,5 +27,4 @@ class Reservation < ApplicationRecord
       }
     end
   end
-  
 end
