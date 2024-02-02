@@ -23,6 +23,7 @@ class Reservation < ApplicationRecord
         reservation_time: reservation.start_time,
         day_of_week: reservation.day_of_week,
         month: reservation.month,
+        day_of_month: reservation.day_of_month,
         created_at_formatted: reservation.created_at.strftime('%B %d, %Y %H:%M')
       }
     end
