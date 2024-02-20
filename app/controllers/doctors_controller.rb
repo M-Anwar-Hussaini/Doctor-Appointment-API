@@ -40,19 +40,22 @@ class DoctorsController < ApplicationController
     if current_user && (current_user.role.downcase == 'admin')
       # Log the parameters being received
       Rails.logger.debug "Received parameters: #{params.inspect}"
-
+    
       @doctor = Doctor.new(doctor_params)
       @doctor.created_by = current_user
-
+    
       # Log the doctor_params method result
       Rails.logger.debug "doctor_params result: #{doctor_params.inspect}"
-
+    
       # Parse starting_shift and ending_shift strings into Time objects
-      @doctor.starting_shift = Time.parse(doctor_params[:starting_shift])
-      @doctor.ending_shift = Time.parse(doctor_params[:ending_shift])
-      Rails.logger.debug "Starting Shift Param: #{doctor_params[:starting_shift]}"
-      Rails.logger.debug "Ending Shift Param: #{doctor_params[:ending_shift]}"
-
+      starting_shift_param = doctor_params[:starting_shift]
+      ending_shift_param = doctor_params[:ending_shift]
+      Rails.logger.debug "Starting Shift Param: #{starting_shift_param}"
+      Rails.logger.debug "Ending Shift Param: #{ending_shift_param}"
+    
+      @doctor.starting_shift = Time.parse(starting_shift_param) if starting_shift_param.present?
+      @doctor.ending_shift = Time.parse(ending_shift_param) if ending_shift_param.present?
+    
       if @doctor.save
         render json: @doctor, status: :created, location: @doctor
       else
@@ -62,6 +65,7 @@ class DoctorsController < ApplicationController
       render json: { error: 'You do not have permission to create a doctor.' }, status: :unauthorized
     end
   end
+  
 
   # PATCH/PUT /doctors/1
   def update

@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   end
 
   # Route to fetch reservations created under doctors by a specific user
-  get '/users/:id/reservations_created_under_doctors', to: 'users#reservations_created_under_doctors', as: 'user_reservations'
+  get '/users/:id/your_reservations', to: 'users#reservations_created_under_doctors_by_a_user', as: 'user_reservations'
 
   # Route to fetch all reservations with associated doctors
   get 'all_reservations', to: 'reservations#reservations_with_doctors'

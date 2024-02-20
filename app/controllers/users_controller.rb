@@ -14,6 +14,12 @@ class UsersController < ApplicationController
     render json: @user
   end
 
+  def reservations_created_under_doctors_by_a_user
+    user = User.find(params[:id])
+    user_reservations = Reservation.reservations_by_user(user.id)
+    render json: user_reservations
+  end
+
   # GET /users/:id/reservations_created_under_doctors
   def reservations_created_under_doctors
     @user = User.find(params[:id])
